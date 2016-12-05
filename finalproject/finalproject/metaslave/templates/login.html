@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Login {% endblock %}
+
+{% block content %}
+<div class="top-bar" id="main-menu">
+  <div class="top-bar-left">
+    <ul class="dropdown menu" data-dropdown-menu>
+      <li class="menu-text">Metaslave</li>
+    </ul>
+  </div>
+  <div class="top-bar-right">
+    <ul class="dropdown menu" data-dropdown-menu>
+      {% if user.is_authenticated %}
+      <li><a href="/logout/">Logout</a></li>
+      {% else %}
+      <li class="menu-text">Log In</li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
+<div class="row">
+  <div class="medium-6 medium-centered large-4 large-centered columns">
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <div class="row column log-in-form">
+        <h4 class="text-center">Log In</h4>
+        {{ form.errors }}
+        <label>{{ form.username.label_tag }}
+          {{ form.username }}
+        </label>
+        <label>{{ form.password.label_tag }}
+          {{ form.password }}
+        </label>
+        <input type="submit" class="button expanded" value="Log In">
+        <a href="/register" class="button expanded">Register</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

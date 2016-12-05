@@ -1,0 +1,28 @@
+{% extends "basegame.html" %}
+{% load static %}
+
+{% block title %} Metaslave {% endblock %}
+
+{% block style %}
+canvas {
+    border: 1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+{% endblock %}
+
+{% block content %}
+<body onload="mainMenu()">
+  <div class="row">
+    <div class="medium-centered large-centered column">
+    <canvas id="gameCanvas" width="1024" height="800"></canvas>
+  </div>
+  <div class = "row" style="visibility:hidden">
+    <div class="medium-7 medium-centered large-5 large-centered columns">
+      <button id="saveButton" type="button" onclick="saveGame()" class="success button expanded">Save Game</button>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static "js/metaslave.js" %}"></script>
+{% endblock %}
