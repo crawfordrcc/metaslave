@@ -24,6 +24,13 @@ class ItemInstance(models.Model):
     item=models.ForeignKey(Item, on_delete=models.CASCADE)
     inventory=models.ForeignKey(Inventory, on_delete=models.CASCADE)
 
+class GameSave(models.Model):
+    user=models.ForeignKey(User)
+    name=models.CharField(max_length=16)
+    x_position=models.IntegerField()
+    y_position=models.IntegerField()
+    currentTileMap=models.CharField(max_length = 20)
+
 
 
 

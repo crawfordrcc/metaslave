@@ -2,13 +2,203 @@ const WKEY=87;
 const AKEY=65;
 const SKEY=83;
 const DKEY=68;
+const EKEY=69;
 var player;
 var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext("2d");
 var width = canvas.getAttribute('width');
 var height = canvas.getAttribute('height');
 var left = canvas.offsetLeft;
-console.log(left);
+var currentTileMap
+tileSize = 64;
+cols = 16;
+rows = 12;
+/*
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+ */
+function tilemap(visual, objects){
+  //this.tileSize = 64;
+  //this.cols = 12;
+  //this.rows = 16;
+  this.tiles = new Image();
+  this.objects = new Image();
+  this.tiles.src = "/static/images/tiles.png";
+  this.objects.src = "/static/images/building.png";
+  this.visualGrid = visual;
+  this.objectGrid = objects;
+  this.getTile = function(row,col){
+    return this.visualGrid[row*cols + col]
+  }
+  this.getObjectTile = function(row, col){
+    return this.objectGrid[row*cols + col]
+  }
+  this.drawTileMap = function(){
+    for (var c = 0; c < cols; c++) {
+        for (var r = 0; r < rows; r++) {
+            var tile = this.getTile(r, c);
+            var object = this.getObjectTile(r, c);
+            ctx.drawImage(
+                this.tiles,
+                tile * tileSize,
+                0,
+                tileSize,
+                tileSize,
+                c * tileSize,  // target x
+                r * tileSize, // target y
+                tileSize,
+                tileSize
+            );
+            if(object > 0)
+              ctx.drawImage(
+                this.objects,
+                (object-1) * tileSize,
+                0,
+                tileSize,
+                tileSize,
+                c * tileSize,  // target x
+                r * tileSize, // target y
+                tileSize,
+                tileSize
+              )
+        }
+    }
+  }
+  this.updateTiles = function(playerRow, playerCol, direction){
+    tile = this.getTile(playerRow, playerCol)
+    ctx.drawImage(
+        this.tiles,
+        tile * tileSize,
+        0,
+        tileSize,
+        tileSize,
+        playerCol * tileSize,  // target x
+        playerRow * tileSize, // target y
+        tileSize,
+        tileSize
+    );
+    if(playerRow!= 0){
+      tile = this.getTile(playerRow - 1, playerCol)
+      ctx.drawImage(
+          this.tiles,
+          tile * tileSize,
+          0,
+          tileSize,
+          tileSize,
+          playerCol * tileSize,  // target x
+          (playerRow-1) * tileSize, // target y
+          tileSize,
+          tileSize
+      );
+      object = this.getObjectTile(playerRow - 1, playerCol)
+      if(object > 0){
+        ctx.drawImage(
+            this.objects,
+            (object-1) * tileSize,
+            0,
+            tileSize,
+            tileSize,
+            playerCol * tileSize,  // target x
+            (playerRow-1) * tileSize, // target y
+            tileSize,
+            tileSize
+        );
+      }
+    }
+    if(direction != 0){
+      var c = playerCol;
+      var r = playerRow;
+      if(direction == 1)
+        ++c;
+      else if(direction == 2)
+        --c;
+      else if(direction == 3)
+        ++r;
+      else
+        --r;
+
+      tile = this.getTile(r, c)
+      ctx.drawImage(
+          this.tiles,
+          tile * tileSize,
+          0,
+          tileSize,
+          tileSize,
+          c * tileSize,  // target x
+          r * tileSize, // target y
+          tileSize,
+          tileSize
+      );
+      if(r != 0){
+          tile = this.getTile(--r, c)
+          ctx.drawImage(
+            this.tiles,
+            tile * tileSize,
+            0,
+            tileSize,
+            tileSize,
+            c * tileSize,  // target x
+            r * tileSize, // target y
+            tileSize,
+            tileSize
+          );
+          object = this.getObjectTile(r, c)
+          if(object > 0){
+            ctx.drawImage(
+              this.objects,
+              (object-1) * tileSize,
+              0,
+              tileSize,
+              tileSize,
+              c * tileSize,  // target x
+              r * tileSize, // target y
+              tileSize,
+              tileSize
+            );
+          }
+      }
+    }
+  }
+};
+
+
+visual1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 10, 3, 3, 3, 3, 8, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           3, 3, 3, 3, 3, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 6, 8, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+object1 = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 7, 8, 8, 9, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 4, 5, 5, 6, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 3, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 7, 8, 8, 8, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 4, 5, 5, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 4, 5, 5, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+           0, 1, 2, 2, 2, 3, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+var map1 = new tilemap(visual1, object1)
 
 function mainMenu(){
   var lingrad = ctx.createLinearGradient(0,0,0,height);
@@ -36,9 +226,9 @@ function mainMenu(){
 }
 
 function gamestart(){
-  player = new component(64, 64, "/static/images/robot.png", 100, 100);
-  house1 = new component(128, 128, "/static/images/house1.png", 256, 256);
-  house2 = new component(128, 128, "/static/images/house1.png", 640, 512);
+  player = new component(64, 64, "/static/images/new_robot.png", 128, 128);
+  currentTileMap = map1;
+  currentTileMap.drawTileMap();
   gameArea.start();
 }
 
@@ -53,7 +243,7 @@ var gameArea = {
        window.addEventListener('keyup', function (e) {
            gameArea.keys[e.keyCode] = false;
        })
-        this.interval = setInterval(updateGameArea, 30);
+        this.interval = setInterval(updateGameArea, 20);
         },
     clear : function() {
         ctx.clearRect(0, 0, width, height);
@@ -67,24 +257,24 @@ var gameArea = {
 function component(width, height, filename, x, y) {
     this.bmp = new Image();
     this.bmp.src=filename;
-    this.width = width;
-    this.height = height;
-    this.speedX = 0;
-    this.speedY = 0;
+    this.moving = 0;
+    this.nextmove = false;
+    this.tilex = x/tileSize
+    this.tiley = y/tileSize
     this.x = x;
     this.y = y;
     this.wobble = 0;
-    this.wobbleIncrement = 4*Math.PI/180;
-    this.maxWobble = 20*Math.PI/180;
+    this.wobbleIncrement = 3*Math.PI/180;
+    this.maxWobble = 24*Math.PI/180;
     this.update = function() {
         ctx.save();
-        if(this.speedX != 0 || this.speedY != 0){
+        if(this.moving != 0){
           if(Math.abs(this.wobble) >= this.maxWobble)
             this.wobbleIncrement = -this.wobbleIncrement;
           this.wobble += this.wobbleIncrement;
-          ctx.translate(this.x + this.width/2, this.y + this.height/2);
+          ctx.translate(this.x + tileSize/2, this.y + tileSize/2);
           ctx.rotate(this.wobble);
-          ctx.translate(-this.x - this.width/2, -this.y - this.height/2);
+          ctx.translate(-this.x - tileSize/2, -this.y - tileSize/2);
         }
         else{
           this.wobble = 0;
@@ -93,45 +283,101 @@ function component(width, height, filename, x, y) {
         ctx.drawImage(this.bmp,
           this.x,
           this.y,
-          this.width, this.height);
+          tileSize,
+          tileSize);
         ctx.restore();
     }
     this.newPos = function() {
-        this.x += this.speedX;
-        this.y += this.speedY;
+      var nTilex = 0;
+      var nTiley = 0;
+      if(this.moving == 1){
+        this.x += tileSize/16
+        nTilex = 1;
+      }
+      else if(this.moving == 2){
+        this.x -= tileSize/16
+        nTilex = -1;
+      }
+      else if(this.moving == 3){
+        this.y += tileSize/16
+        nTiley = 1;
+      }
+      else if(this.moving == 4){
+        this.y -= tileSize/16
+        nTiley = -1;
+      }
+      if(this.moving != 0){
+        if((this.x%tileSize == 0) && (this.y%tileSize == 0)){
+          this.nextmove = true;
+          this.tilex += nTilex;
+          this.tiley += nTiley;
+        }
+      }
     }
 }
 
-function staticComponent() {
-  this.bmp
+function staticComponent(){
+  this.bmp = new Image();
+  this.bmp.src=filename;
+  this.width = width;
+  this.height = height;
 }
 
 function updateGameArea() {
-    var lingrad = ctx.createLinearGradient(0,0,0,height);
+  if(gameArea.keys){
+    if(gameArea.keys[EKEY]){
+      saveGame();
+    }
+  }
+    if(player.nextmove){
+      player.nextmove = false;
+      player.moving = 0;
+    }
+    if(player.moving == 0){
+      if(gameArea.keys){
+        if(gameArea.keys[WKEY]){
+          var object;
+          if(player.tiley == 0)
+            object = currentTileMap.getObjectTile(player.tiley, player.tilex) + 1
+          else
+            object = currentTileMap.getObjectTile(player.tiley - 1, player.tilex)
+          if(object <= 0)
+            player.moving = 4
+          //player.wobbleIncrement *= -1;
+        }
+        if(gameArea.keys[AKEY]){
+          var object;
+          if(player.tilex == 0)
+            object = currentTileMap.getObjectTile(player.tiley, player.tilex) + 1
+          else
+            object = currentTileMap.getObjectTile(player.tiley, player.tilex - 1)
+          if(object <= 0)
+            player.moving = 2
+          //player.wobbleIncrement *= -1;
+        }
+        if(gameArea.keys[SKEY]){
+          var object;
+          if(player.tiley == (rows - 1))
+            object = currentTileMap.getObjectTile(player.tiley, player.tilex) + 1
+          else
+            object = currentTileMap.getObjectTile(player.tiley  + 1, player.tilex)
+          if(object <= 0)
+            player.moving = 3
+        }
+        if(gameArea.keys[DKEY]){
+          var object;
+          if(player.tilex == (cols - 1))
+            object = currentTileMap.getObjectTile(player.tiley, player.tilex) + 1
+          else
+            object = currentTileMap.getObjectTile(player.tiley, player.tilex + 1)
+          if(object <= 0)
+            player.moving = 1
 
-    gameArea.clear();
-    lingrad.addColorStop(0, '#000');
-    lingrad.addColorStop(1, '#ddd');
-    ctx.fillStyle = lingrad;
-    ctx.fillRect(0,0,width, height);
-    player.speedX = 0;
-    player.speedY = 0;
-    if(gameArea.keys){
-      if(gameArea.keys[WKEY]){
-        player.speedY = -4
-      }
-      if(gameArea.keys[AKEY]){
-        player.speedX = -4
-      }
-      if(gameArea.keys[SKEY]){
-        player.speedY = 4
-      }
-      if(gameArea.keys[DKEY]){
-        player.speedX = 4
+        }
       }
     }
-    house1.update();
-    house2.update();
+
+    currentTileMap.updateTiles(player.tiley, player.tilex, player.moving);
     player.newPos();
     player.update();
 }
@@ -147,6 +393,37 @@ function getMousePosition(e){
   }
 }
 
+
+
 function saveGame(){
-  
+    $.ajax({
+        type:"POST",
+        url:"/game/save/",
+        data: {
+            //csrfmiddlewaretoken: '{{ csrf_token }}',
+            name:'bob',
+            x_position: player.x.toString(),
+            y_position: player.y.toString(),
+            currentTileMap: 'map1'
+
+        },
+        success:function(){}
+      });
+
+
+/*$.post('game/save',
+{
+    name : 'bob', //pass the score here
+    x_position: player.x,  // pass the win value here
+    y_position: player.y,
+    currentTileMap: 'map1'
+},
+function(data) {
+    if(data.status == 1){
+        // success! Do something
+    }
+    else{
+        // error! Do something
+    }
+});*/
 }

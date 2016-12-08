@@ -12,9 +12,10 @@ canvas {
 
 {% block content %}
 <body onload="mainMenu()">
+  {% csrf_token %}
   <div class="row">
     <div class="medium-centered large-centered column">
-    <canvas id="gameCanvas" width="1024" height="800"></canvas>
+    <canvas id="gameCanvas" width="1024" height="768"></canvas>
   </div>
   <div class = "row" style="visibility:hidden">
     <div class="medium-7 medium-centered large-5 large-centered columns">

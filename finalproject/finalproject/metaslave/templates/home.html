@@ -3,6 +3,16 @@
 
 {% block title %} {{ page_name }} {% endblock %}
 
+{% block style %}
+.centered-element{
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-40%);
+  -ms-transform: translateY(-40%);
+  transform: translateY(-40%);
+}
+{% endblock %}
+
 {% block content %}
 <div class="top-bar" id="main-menu">
   <div class="top-bar-left">
@@ -21,15 +31,17 @@
   </div>
 </div>
 
-<div class="callout large secondary">
-  <div class="row column text-center">
+<div class="centered-element">
+  <div class="row column text-center" style="margin-bottom:50px">
     <h1>Metaslave</h1>
   </div>
-</div>
 
-<div class="large expanded centered row">
-  <div class="medium-6 medium-centered large-4 large-centered columns">
-    <a href="/gamestart", class="large alert button expanded">Play Now!</a>
+  <div class="large expanded centered row">
+    <div class="medium-6 medium-centered large-4 large-centered columns" style="width:500px; height:500px;">
+      <a href="/gamestart">
+        <img src="/static/res/play-button.png" alt="Play button" style="display:block; margin:0 auto;">
+      </a>
+    </div>
   </div>
 </div>
 {% endblock %}
