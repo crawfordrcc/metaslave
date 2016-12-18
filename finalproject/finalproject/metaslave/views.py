@@ -4,6 +4,7 @@ from django.http import JsonResponse
 import datetime
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers
 
 import simplejson as json
 from .forms import *
@@ -43,23 +44,24 @@ def gamestart(request):
 
 @csrf_exempt
 def gamesave(request):
-    data= request.POST.get('data', None)
-    data = json.dumps( data )
-
+    #data= request.POST.get('data')
+    data = request.POST
+    #data = json.loads(data)
+    #print(data)
     try:
         save = GameSave.objects.create(
             user = request.user,
             name = data['name'],
             x_position = int(data['x_position']),
             y_position = int(data['y_position']),
-            currentTileMap = data['currentTileMap']
+            currentGameMap = int(data['currentGameMap'])
         )
-        save.save()
+        #save.save()
         response = {
             'status': 1,
             'message': 'Game saved successfully'
         }
-        return HttpResponse(response, mimetype='application/json')
+        return HttpResponse(response, content_type='application/json')
 
     except Exception as e:
 
@@ -68,4 +70,22 @@ def gamesave(request):
              'status': 0,
              'message': 'Something went wrong - ' +str(e)
          }
+         print(response)
     return HttpResponse(response)
+
+def savedata(request):
+    if request.method == 'GET':
+        objects = GameSave.objects.filter(user=request.user)[:3]
+        data = [ob.as_json() for ob in objects]
+        response = {
+            'status': 1,
+            'data' : data
+        }
+        #print(data)
+    else:
+        response = {
+            'status': 0,
+            'data' : {}
+        }
+    #print(response)
+    return HttpResponse(json.dumps(response), content_type='application/json')

@@ -14,12 +14,9 @@ canvas {
 <body onload="mainMenu()">
   {% csrf_token %}
   <div class="row">
-    <div class="medium-centered large-centered column">
-    <canvas id="gameCanvas" width="1024" height="768"></canvas>
-  </div>
-  <div class = "row" style="visibility:hidden">
-    <div class="medium-7 medium-centered large-5 large-centered columns">
-      <button id="saveButton" type="button" onclick="saveGame()" class="success button expanded">Save Game</button>
+    <div class="medium-centered large-centered column" style="position:relative">
+      <canvas id="gameCanvas" width="1024" height="768"></canvas>
+      <input id="name" type="text" style="background:none; color:white; position:absolute; left:430px; top:700px; width:200px; visibility:hidden;">
     </div>
   </div>
 {% endblock %}

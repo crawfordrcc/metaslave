@@ -29,7 +29,21 @@ class GameSave(models.Model):
     name=models.CharField(max_length=16)
     x_position=models.IntegerField()
     y_position=models.IntegerField()
-    currentTileMap=models.CharField(max_length = 20)
+    currentGameMap=models.IntegerField(default=0)
+
+    def as_json(self):
+        return dict(
+            id=self.id,
+            name=self.name,
+            x_position=self.x_position,
+            y_position=self.y_position,
+            currentGameMap=self.currentGameMap
+        )
+
+class Message(models.Model):
+    name=models.CharField(max_length=16)
+    object_id=models.IntegerField()
+    content=models.CharField(max_length=128)
 
 
 
